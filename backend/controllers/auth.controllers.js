@@ -1,5 +1,6 @@
 import { User } from '../models/user.model.js';
 import bcryptjs from "bcryptjs";
+import { generateTokenAndSetCookie } from '../utlis/generateToken.js';
 
 
 //Sign up function
@@ -49,9 +50,15 @@ export async function signup(req, res) {
       image: image,
     })
 
-    await newUser.save() //Saving new user
+    
+      generateTokenAndSetCookie(newUser._id, res); //token generation
+      await newUser.save() //Saving new user
+      res.status(201).json({Sucess: true, user: {...newUser._doc, password:""}}) //Creation response for backend
+    
 
-    res.status(201).json({Sucess: true, user: {...newUser._doc, password:""}}) //Creation response for backend
+    
+
+   
 
   } catch (error) {   
     console.log("Error in signup controller", error.message);
