@@ -68,10 +68,45 @@ export async function signup(req, res) {
   }
 }
 
+//Login function
 export async function login(req, res) {
-  res.send("Login route");
+ try {
+  const {email, password} = req.body //Fetching email and password from front end 
+
+  if(!email || !password) {   //Empty fields check
+    return res.status(400).json({sucess: false, message: "All fields are required"});
+  }
+
+  const user = await User.findOne({email: email}); //finding the email in database
+  
+  if(!user) {
+    return res.status(404).json({success: false, message: "Invalid credentials"});
+  }
+
+  const isPasswordCorrect = await bcryptjs.compare(password, user.password); //checking if password correct using bcryptjs.compare()
+
+  if(!isPasswordCorrect) {
+    return res.status(400).json({success: false, message:"Invalid credentials"});
+  }
+
+  generateTokenAndSetCookie(user._id, res); //genrating cookie
+
+  res.status(200).json({  //success response for backend
+    success:true,
+    user: {
+      ...user._doc,
+      password: ""
+    }
+  })
+
+
+ } catch (error) {
+    console.log("Error in login controller", error.message);
+    res.status(500).json({success: false, message: "Internal server error"})
+ }
 }
 
+//Logout function
 export async function logout(req, res) {
  try {
   res.clearCookie("jwt-netflix"); //Removing the cookie
