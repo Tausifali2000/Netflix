@@ -52,7 +52,9 @@ export async function signup(req, res) {
 
     
       generateTokenAndSetCookie(newUser._id, res); //token generation
+      
       await newUser.save() //Saving new user
+      
       res.status(201).json({Sucess: true, user: {...newUser._doc, password:""}}) //Creation response for backend
     
 
@@ -71,5 +73,11 @@ export async function login(req, res) {
 }
 
 export async function logout(req, res) {
-  res.send("Logout route");
+ try {
+  res.clearCookie("jwt-netflix"); //Removing the cookie
+  res.status(200).json({sucess: true, message: "Logged out successfully"});
+ } catch (error) {
+  console.log("Error in logout controller", error.message);
+  res.status(500).json({sucess: false, message: "Internal server error"});
+ }
 }
