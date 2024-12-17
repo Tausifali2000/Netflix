@@ -89,7 +89,7 @@ export async function login(req, res) {
     return res.status(400).json({success: false, message:"Invalid credentials"});
   }
 
-  generateTokenAndSetCookie(user._id, res); //genrating cookie
+  generateTokenAndSetCookie(user._id, res); //generating cookie
 
   res.status(200).json({  //success response for backend
     success:true,
